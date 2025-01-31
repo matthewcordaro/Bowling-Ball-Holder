@@ -3,6 +3,9 @@ A fully customizable OpenSCAD of a bowling ball holder that can have text put on
 
 Simply adjust the parameters. I recommend using OpenSCAD to edit.
 
+![Bowling Ball Holder with Text](ball-holder-with-name.jpg "Bowling Ball Holder with Text - Alpha Build")
+
+_Alpha build above_
 
 ## Contributors
 Matthew Cordaro
