@@ -1,6 +1,5 @@
 # Bowling Ball Holder with Text
-Fully customizeable SCAD of a bowling ball holder that can have text put on it!
-You can change the text, text, depth. Make the text inny or outty. Change the wall thickness, holder height, lip size, and more!
+A fully customizable OpenSCAD of a bowling ball holder that can have text put on it! You can change the text, text, depth. Make the text inny or outty. Change the wall thickness, holder height, lip size, and more!
 
 Simply adjust the parameters. I recommend using OpenSCAD to edit.
 
