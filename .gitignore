@@ -1,0 +1,17 @@
+### OpenSCAD export files
+
+# 3D Formats
+*.stl  # Stereolithography
+*.off  # Object File Format
+*.amf  # Additive Manufacturing File
+*.3mf  # 3D Manufacturing Format
+
+# 2D Formats
+*.dxf  # Drawing Exchange Format
+*.svg  # Scalable Vector Graphics
+*.png  # Portable Network Graphics
+*.pdf  # Portable Document Format
+
+# Other
+*.csg  # Constructive Solid Geometry
+
