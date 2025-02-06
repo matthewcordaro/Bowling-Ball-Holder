@@ -1,17 +1,37 @@
 # Bowling Ball Holder with Text
-A fully customizable OpenSCAD of a bowling ball holder that can have text put on it! You can change the text, text, depth. Make the text inny or outty. Change the wall thickness, holder height, lip size, and more!
 
-Simply adjust the parameters. I recommend using OpenSCAD to edit.
+A fully customize-able bowling ball holder with text on it! Even change the text depth, make the text inny or outty. Modify the wall thickness, holder height, lip size, and more!
 
 ![Example of Bowling Ball Holder with Text](example.jpg "Example of Bowling Ball Holder with Text - Alpha Build")
 
 _Alpha build above_
 
-## Contributors
-Matthew Cordaro
+## Customize
 
-_Become a contributor!  Feel free to issue any pull requests for added featurs if you'd like to share._
+**It is generally recommend using OpenSCAD**  This way, you may make and view your modifications prior to rendering.  Unfortunately, rendering can take a lot of time because, OpenSCAD is single threaded. 
+
+### OpenSCAD
+
+1. Open `holder.scad`
+2. Modify the variable in the file or on the right with the GUI
+3. Render it: _F6_ OR _Design➡Render_ (May take a while)
+4. Export it: _F7_ for `stl` OR _File➡Export_ and select the file type wanted.
+
+### Command-line
+
+Adjust the parameters in the `holder.json` file, then run the following command: (Replace `stl` with `3mf` or other supported export types)
+
+```
+openscad -o holder.stl -p holder.json holder.scad
+```
+
+_Note: Name change only?  Use `-D name="TEXT"` in place of `-p holder.json`._
 
 
-### Licence
+## Contribute
+
+_Become a contributor!  Feel free to issue any pull requests for added features to share._
+
+---
+
 SCAD Bowling Ball Holder with Text © 2025 by Matthew Cordaro is licensed under CC BY-NC-SA 4.0 
