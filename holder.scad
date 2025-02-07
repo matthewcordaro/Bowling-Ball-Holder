@@ -1,141 +1,182 @@
 /*
-SCAD Bowling Ball Holder with Text © 2025 by Matthew Cordaro is licensed under CC BY-NC-SA 4.0 
+* SCAD Bowling Ball Holder with Text © 2025 by Matthew Cordaro is licensed under CC BY-NC-SA 4.0 
 */
 
-// ONLY UPPERCASE FOR NAME
-name = "TEXT"; 
+/* [Text] */
+// ONLY USE UPPERCASE
+Text_String = "TEXT";
 
-// Distance between edge and text in cm
-text_height_offset = 1.25;
+// Text is inny or outty (cut/pop)
+Text_Inny = false;  // [true:Inny, false:Outty]
+
+// Distance between edge and text
+Text_Height_Offset = 0.6;  // [0.15:0.02:2.5]
 
 // how far in to cut/pop the text out of the cone in cm
-text_depth = 0.2;
+Text_Depth = 0.1;  // [0.05:0.01:0.2]
 
-// Should text cut/pop (inny/outty
-text_inny = false;
+// This changes separation of characters (Works by feel)
+Character_Separation = 10;  // [2:0.1:40]
 
-// This is an estimate that effects seperation of characters. Needs to be adjusted with other variables for preference.
-text_factor = 20; 
-
-// How smooth to make the model (>50, <400) quality vs. performance
-facets = 200;
-
-// Thickness of the shell in cm
-shell_thickness = 0.6;
+/* [Shape] */
+// How wide to extend the holder's base in CM
+Bottom_Radius_Offset = 2.5;  // [1.0:0.1:4.0]
 
 // Holder's height in cm
-holder_height = 4.5;
+Holder_Height = 3.0;  // [2:0.1:5]
 
-// Hole at bottom in cm
-punch_hole_radius = 2.5;
+// Thickness of the shell in cm
+Shell_Thickness = 0.5;  // [0.3:0.05:0.8]
 
 // Upper Lip thickness in cm
-lip_offset = 0.4;
+Lip_Offset = 0.3;  // [0.2:0.01:0.4]
+
+// Hole at bottom in cm
+Punch_Hole_Radius = 3.5;  // [2:0.1:5]
 
 // The distance to raise the bowling ball from the floor in cm
-cup_bottom_lift = 0.4;
+Cup_Bottom_Lift = 0.3;  // [0.2:0.05:0.8]
 
-// Assertions
-if (text_inny){
-    assert(shell_thickness >= text_depth + 0.2, "shell not thick enough for name punch. increase shell thickness or decrease text depth");
+/* [Quality] */
+// Lower is better performance; Higher is better quality
+Facets = 150; // [50:400]
+
+
+/*
+*   Assertions
+*/
+if (Text_Inny){
+    assert(Shell_Thickness >= Text_Depth + 0.2, "shell not thick enough for Text_String punch. increase shell thickness or decrease text depth");
 }
-assert(facets <= 400, "Too many facets");
-assert(facets >= 50, "Too few facets");
+assert(Facets <= 400, "Too many facets");
+assert(Facets >= 50, "Too few facets");
+assert(Bottom_Radius_Offset >= 1, "Not a wide enough base");
+assert(Cup_Bottom_Lift >= 0.2, "Ball will hit the ground");
 
-// Calculated Dimensions
-//
-// The radius of the bowling ball to be used in all calculations
-// Per USBC Regulations 8.595 inch diameter
-ball_radius = ( 8.595 * 2.54) / 2;
 
-// The "small circle" of the ball (sphere) which is created by
-// the plane defined by the top of the holder
-pythag_a = ball_radius-holder_height+cup_bottom_lift;
-small_circle_radius = sqrt(pow(ball_radius, 2) - pow(pythag_a, 2)); // b (pythagoras)
+/*
+* Constants
+*/
+INCH_TO_CM = 2.54;
+USBC_MAX_DIAMETER_INCH = 8.595;  // United States Bowling Congress Spec Max Diameter
+
+/*
+*   Calculated Dimensions
+*/
+Ball_Radius = ( USBC_MAX_DIAMETER_INCH * INCH_TO_CM) / 2;
+
+// The "small circle" of the ball (sphere) which is created by the plane defined by the top of the holder
+Side_A_Squared = pow(Ball_Radius - Holder_Height + Cup_Bottom_Lift, 2);
+Side_B_Squared = pow(Ball_Radius, 2); 
+Small_Circle_Radius = sqrt(Side_B_Squared - Side_A_Squared);
 
 // Cone Radii
-holder_bottom_radius = ball_radius + 2;  // 2 is arbitrarly set for balance
-holder_top_radius = small_circle_radius + lip_offset;
+Top_Radius = Small_Circle_Radius + Lip_Offset;
+Bottom_Radius = Top_Radius + Bottom_Radius_Offset;
+
+// Distance of the text from the Z Axis
+Text_Distance_From_Z = (Bottom_Radius + Top_Radius)/2;
 
 
-
-// Text distance from z
-text_distance_from_z = (holder_bottom_radius + holder_top_radius)/2;
-
-module cone(){
-    cylinder(h = holder_height,
-             r1 = holder_bottom_radius,
-             r2 = holder_top_radius,
-             $fn = facets);
-}
-
-module cup(){
-    translate([0,
-               0,
-               ball_radius + cup_bottom_lift])
-    sphere(r = ball_radius,
-           $fn = facets);
-}
-
-module side_text(){
-    // Text Height relative to side of cone
-    floor_delta = holder_bottom_radius - holder_top_radius - lip_offset;
-    text_height = sqrt(pow(floor_delta, 2) + pow(holder_height, 2)) - 2 * text_height_offset;
-    lean_angle = atan(holder_height/(floor_delta + lip_offset))-90;
-    
-    
-    degrees_per_character = text_factor / text_height_offset;
-    
-    for (i = [0:len(name)-1]) {
-        // move text to be relative to the cone's surface and
-        // rotate around Z axis for each char
-        rotate([0, 90, i * degrees_per_character])
+/*
+* Basic Holder
+*/
+module basic_holder_shape (){
+    difference(){
+        cylinder(
+            h = Holder_Height,
+            r1 = Bottom_Radius,
+            r2 = Top_Radius,
+            $fn = Facets
+        );
         
-        translate([-holder_height /2, // move to center of cone
-                   0,
-                   text_distance_from_z - text_depth]) // adjust depth of text
-        
-        rotate([lean_angle, // lean letter to match cone surface
-                0,
-                90]) // rotate to align letter upright
-        
-        linear_extrude(height = text_depth * 2)  // x2 is to deal with inny and outty
-        
-        text(name[i],
-             size=text_height,
-             font="Courier",
-             valign = "center",
-             halign = "center",
-             $fn = facets);
+        // Cut out the bowling ball
+        translate([0, 0, Ball_Radius + Cup_Bottom_Lift])
+        sphere(r = Ball_Radius,$fn = Facets);
     }
 }
 
-// Create the holder
-module bowling_ball_holder() {
-    
-    difference() {
-        // Basic Holder: cone - cup
-        cone();
-        cup();
 
-        // Punch out hole in middle
-        translate([0, 0, -1])
-        cylinder(h = holder_height + 2, r = punch_hole_radius, $fn = facets);
+/*
+* Text for the Side
+*/
+module side_text(){
+    translate_x = -Holder_Height / 2;  // move text to the center of the cone
+    translate_z = Text_Distance_From_Z - Text_Depth; // adjust depth of text
+    
+    floor_delta = Bottom_Radius - Top_Radius - Lip_Offset;
+    
+    // Text Height relative to side of cone
+    text_height = sqrt(pow(floor_delta, 2) + pow(Holder_Height, 2)) - 2 * Text_Height_Offset;
+    
+    // Text Rotation
+    rotate_x = atan(Holder_Height/(floor_delta + Lip_Offset))-90;  // lean letter to match cone surface
+    rotate_z = 90;  // rotate to align letter upright
+    
+    
+    Character_Shift_Degrees = Character_Separation / Text_Height_Offset;
+    
+    text_extrude_distance = Text_Depth * 2;  // x2 is to deal with inny and outty
+    
+    // Iterate through the characters
+    for (i = [0:len(Text_String)-1]) {
+        rotate([
+            0,
+            90, // move text to be relative to the cone's surface
+            i * Character_Shift_Degrees // rotate around Z axis for each char
+        ])
+        
+        translate([translate_x, 0, translate_z])
+        
+        rotate([rotate_x, 0, rotate_z])
+        
+        linear_extrude(height = text_extrude_distance)
+        
+        text(
+            Text_String[i],
+            size=text_height,
+            font="Courier",
+            valign = "center",
+            halign = "center",
+            $fn = Facets
+        );
+    }
+}
+
+/*
+* The Bowling Ball Holder
+*/
+module bowling_ball_holder() {
+    color("DarkSlateGray")  // Dark grey
+    difference(){
+        basic_holder_shape();
         
         // Cut out the shell
-        translate([0, 0, -shell_thickness]){
-            difference() {
-                cone();
-                cup();
-            }
-        }
+        translate([0, 0, -Shell_Thickness]) // Naturally makes wall thicker when cone is steeper
+        basic_holder_shape();
+
+        // Cut out hole in middle
+        Over_Cut = 1;
+        translate([0, 0, -Over_Cut/2])  // Translate down by half the over-cut
+        cylinder(
+            h = Holder_Height + Over_Cut,  // Make taller by the over-cut
+            r = Punch_Hole_Radius,
+            $fn = Facets
+        );
         
-        // Cut out text
-        if (text_inny) side_text();
+        // Cut text if it's inny
+        if (Text_Inny) side_text();
     }
     
-    if (!text_inny) side_text();
+    // Outty Text
+    if (!Text_Inny) {
+        color("DarkGoldenrod")
+        side_text();
+    }
 }
 
-// Render the holder
+/*
+* Render the Bowling Ball Holder
+*/
+scale([10, 10, 10])  // Adjust to mm for export
 bowling_ball_holder();

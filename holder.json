@@ -1,0 +1,19 @@
+{
+    "parameterSets": {
+        "design default values": {
+            "Bottom_Radius_Offset": "2.5",
+            "Character_Separation": "10",
+            "Cup_Bottom_Lift": "0.3",
+            "Facets": "150",
+            "Holder_Height": "3",
+            "Lip_Offset": "0.3",
+            "Punch_Hole_Radius": "3.5",
+            "Shell_Thickness": "0.5",
+            "Text_Depth": "0.1",
+            "Text_Height_Offset": "0.6",
+            "Text_Inny": "false",
+            "Text_String": "TEXT"
+        }
+    },
+    "fileFormatVersion": "1"
+}
