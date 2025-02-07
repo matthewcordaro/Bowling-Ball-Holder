@@ -12,11 +12,11 @@ Text_Inny = false;  // [true:Inny, false:Outty]
 // Distance between edge and text
 Text_Height_Offset = 0.6;  // [0.15:0.02:2.5]
 
-// how far in to cut/pop the text out of the cone in cm
-Text_Depth = 0.1;  // [0.05:0.01:0.2]
-
 // This changes separation of characters (Works by feel)
 Character_Separation = 10;  // [2:0.1:40]
+
+// how far in to cut/pop the text out of the cone in cm
+Text_Depth = 0.1;  // [0.05:0.01:0.2]
 
 /* [Shape] */
 // How wide to extend the holder's base in CM
