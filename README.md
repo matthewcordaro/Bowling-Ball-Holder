@@ -2,7 +2,7 @@
 
 A fully customize-able bowling ball holder with text on it! Change the text depth, make the text inny or outty. Even modify the wall thickness, holder height, lip size, and more!
 
-| SCAD | Alpha Biuld Example | 
+| SCAD | Printed Example | 
 | - | - |
 | ![SCAD Example](holder.png) | ![Printed Example](example.jpg) |
 
