@@ -1,10 +1,10 @@
 # Bowling Ball Holder with Text
 
-A fully customize-able bowling ball holder with text on it! Even change the text depth, make the text inny or outty. Modify the wall thickness, holder height, lip size, and more!
+A fully customize-able bowling ball holder with text on it! Change the text depth, make the text inny or outty. Even modify the wall thickness, holder height, lip size, and more!
 
-![Example of Bowling Ball Holder with Text](example.jpg "Example of Bowling Ball Holder with Text - Alpha Build")
-
-_Alpha build above_
+| SCAD | Alpha Biuld Example | 
+| - | - |
+| ![SCAD Example](holder.png) | ![Printed Example](example.jpg) |
 
 ## Customize
 
