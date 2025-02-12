@@ -1,19 +1,20 @@
 {
+    "fileFormatVersion": "1",
     "parameterSets": {
-        "design default values": {
-            "Bottom_Radius_Offset": "2.5",
-            "Character_Separation": "10",
-            "Cup_Bottom_Lift": "0.3",
-            "Facets": "150",
-            "Holder_Height": "3",
-            "Lip_Offset": "0.3",
-            "Punch_Hole_Radius": "3.5",
-            "Shell_Thickness": "0.5",
-            "Text_Depth": "0.1",
-            "Text_Height_Offset": "0.6",
-            "Text_Inny": "false",
-            "Text_String": "TEXT"
+        "New set 1": {
+            "BASE_RADIUS": "8",
+            "BRIM_OUTTER_RADIUS": "6.7",
+            "BRIM_THICKNESS": "0.15",
+            "CUP_BOTTOM_LIFT": "0.3",
+            "DEGREES_PER_CHARACTER": "8",
+            "FACETS": "50",
+            "HOLE_RADIUS": "2.5",
+            "SHELL_THICKNESS": "0.5",
+            "SHOW_EXTRUDER_NUMBER": "0",
+            "TEXT_DEPTH": "0.1",
+            "TEXT_FONT": "Consolas",
+            "TEXT_HEIGHT": "1.5",
+            "TEXT_STRING": "Your Text"
         }
-    },
-    "fileFormatVersion": "1"
+    }
 }
