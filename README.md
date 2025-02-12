@@ -1,6 +1,6 @@
 # Multi Color Bowling Ball Holder with Text
 
-A fully customizable bowling ball holder with text on it! Change the font, text size, spacing, and depth. Modify all diameters, the wall thickness, lip size, and more.  Export multiple stl files to combine in your slices to create a multi color print!
+A fully customizable multicolor bowling ball holder with text on it! Change the font, text size, spacing, and depth. Modify all diameters, the wall thickness, lip size, and more.  Export multiple stl files to combine in your slices to create a multi color print!
 
 | SCAD | Printed Example |
 | - | - |
