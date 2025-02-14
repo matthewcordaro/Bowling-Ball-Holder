@@ -4,19 +4,13 @@
 
 
 /* [Text] */
-// Text to show
 TEXT_STRING = "Your Text";
 
-// Fixed width fonts only
-TEXT_FONT = "Consolas"; // ["Cascadia Mono", "Consolas", "Courier New", "Lucida Console"]
+TEXT_FONT = "Arial";  // ["Arial", "Calibri", "Candara", "Comic Sans MS", "Consolas", "Courier New", "Georgia", "Impact", "Lucida Console", "Lucida Sans Unicode", "Palatino Linotype", "Segoe Print", "Segoe Script", "Segoe UI", "Tahoma", "Times New Roman", "Trebuchet MS", "Verdana"]
 
-// Height, in cm
-TEXT_HEIGHT = 1.5;  // [0.15:0.02:12]
+TEXT_HEIGHT = 1.5;  // [0.15:0.01:4.75]
 
-// Separation of characters, in degrees
-DEGREES_PER_CHARACTER = 10;  // [2:0.1:40]
-
-// Depth of cut & pop out of the text, in cm
+// Depth of cut & pop out, in cm
 TEXT_DEPTH = 0.1;  // [0.05:0.01:0.2]
 
 
@@ -25,10 +19,10 @@ TEXT_DEPTH = 0.1;  // [0.05:0.01:0.2]
 BASE_RADIUS = 8.0;  // [2.4:0.1:10]
 
 // Radius of the Brim, in cm
-BRIM_OUTER_RADIUS = 6.7;  // [2.3:0.1:9]
+BRIM_OUTER_RADIUS = 6.7;  // [2.3:0.1:9.5]
 
 // Radius of the Hole, in cm
-HOLE_RADIUS = 2.5; // [1:0.1:5]
+HOLE_RADIUS = 2.5;  // [1:0.1:8]
 
 // Upper Lip thickness, in cm
 BRIM_THICKNESS = 0.15;  // [0.1:0.01:0.4]
@@ -40,12 +34,11 @@ SHELL_THICKNESS = 0.5;  // [0.35:0.05:0.8]
 CUP_BOTTOM_LIFT = 0.3;  // [0.2:0.05:0.8]
 
 
-/* [Quality] */
-// Lower is better performance; Higher is better quality
-FACETS = 50; // [50:1500]
-
-
 /* [3D Exporting] */
+// Max this before rendering
+FACETS = 50;  // [50:750]
+$fn = FACETS;
+
 // Select Extruder Number for exporting (0 is all extruders)
 SHOW_EXTRUDER_NUMBER = 0;  // [0:2]  
 
@@ -88,15 +81,18 @@ assert(
 assert(
     CUP_BOTTOM_LIFT >= 0.2,
     "Ball will hit the ground");
+assert (CONE_FACE_LENGTH > TEXT_HEIGHT,
+    "Text too big for the face.");
 
     
 /* Hide following variables from customizer */
-if(false){}  
+if(false){}
 
 
 /*
 * Constants
 */
+TAU = 2 * PI;
 INCH_TO_CM = 2.54;
 USBC_MAX_DIAMETER_INCH = 8.595;  // United States Bowling Congress Spec Max Diameter
 BALL_RADIUS = ( USBC_MAX_DIAMETER_INCH * INCH_TO_CM) / 2;
@@ -105,12 +101,45 @@ BALL_RADIUS = ( USBC_MAX_DIAMETER_INCH * INCH_TO_CM) / 2;
 // a is the brim's inner radius 
 // c is the ball's radius
 // so b is Ball's radius + the height - the cup's bottom lift
-HOLDER_HEIGHT = BALL_RADIUS - pythag_b(BRIM_OUTER_RADIUS - BRIM_THICKNESS, BALL_RADIUS) + CUP_BOTTOM_LIFT ;
+HOLDER_HEIGHT = BALL_RADIUS - pythag_a(BRIM_OUTER_RADIUS - BRIM_THICKNESS, BALL_RADIUS) + CUP_BOTTOM_LIFT ;
+
+// Length of the cone's face from the base to the brim.
+CONE_FACE_LENGTH = pythag_c(BASE_RADIUS - BRIM_OUTER_RADIUS, HOLDER_HEIGHT);
+
+/*
+* Functions
+*/
+// Sum a list between i & j. i & j are inclusive.
+function sum_between_indices(list, i, j) = 
+    i > j ? 0 :
+    i < 0 || j >= len(list) ? "Index out of bounds" :
+    list[i] + sum_between_indices(list, i + 1, j);
 
 // Pythagoras
-function pythag_b(a, c) = sqrt(pow(c, 2) - pow(a, 2));
+function pythag_a(b, c) = sqrt(pow(c, 2) - pow(b, 2));
 function pythag_c(a, b) = sqrt(pow(a, 2) + pow(b, 2));
 
+// Calculate character width using textmetrics()
+function char_width(char) =
+    char == " " ? TEXT_HEIGHT/3 :
+    textmetrics(text=char, size=TEXT_HEIGHT, font=TEXT_FONT).size.x;
+
+// Calculate rotation angle for a character
+function char_rot_z(char) =
+    (char_width(char) * 360) / 
+    (TAU * BRIM_OUTER_RADIUS);
+
+// Generate a list of rotations between each letter pair (i,j).
+// This is to calculate the placement location of j relative to i
+function char_rot_z_list() = [
+        0,
+        for (i = [1 : len(TEXT_STRING) - 1])
+            (char_rot_z(TEXT_STRING[i-1]) + char_rot_z(TEXT_STRING[i])) / 2
+];
+
+// Function to accumulate rotation angles
+function cumulative_z(i) = 
+        sum_between_indices(char_rot_z_list(), 0, i);
 
 /*
 * Basic Holder
@@ -120,13 +149,12 @@ module Basic_Holder_Shape(){
         cylinder(
             h = HOLDER_HEIGHT,
             r1 = BASE_RADIUS,
-            r2 = BRIM_OUTER_RADIUS,
-            $fn = FACETS
+            r2 = BRIM_OUTER_RADIUS
         );
         
         // Cut out the bowling ball
         translate([0, 0, BALL_RADIUS + CUP_BOTTOM_LIFT])
-        sphere(r = BALL_RADIUS,$fn = FACETS);
+        sphere(BALL_RADIUS);
     }
 }
 
@@ -138,7 +166,6 @@ module Side_Text(){
     
     // Wrap text around
     char_rot_y = 90;  // move text to be relative to the cone's surface
-    char_rot_z_deg = DEGREES_PER_CHARACTER;
     
     // Distance of text from origin, 
     translate_z = BASE_RADIUS - TEXT_DEPTH;
@@ -151,12 +178,11 @@ module Side_Text(){
     text_extrude_distance = TEXT_DEPTH * 2;  
     
     // Where the baseline should be
-    exterior_face_height = pythag_c(BASE_RADIUS - BRIM_OUTER_RADIUS, HOLDER_HEIGHT);
-    text_bottom = (exterior_face_height - TEXT_HEIGHT) / 2;
+    text_bottom = (CONE_FACE_LENGTH - TEXT_HEIGHT) / 2;
     
     // Place each character
     for (i = [0:len(TEXT_STRING)-1]) {
-        rotate([0, char_rot_y, i * char_rot_z_deg])
+        rotate([0, char_rot_y, cumulative_z(i)])
         translate([0, 0, translate_z])
         rotate([rotate_x, 0, rotate_z])
         translate([0, text_bottom, 0])
@@ -166,8 +192,7 @@ module Side_Text(){
             size = TEXT_HEIGHT,
             font = TEXT_FONT,
             valign = "baseline",
-            halign = "center",
-            $fn = FACETS
+            halign = "center"
         );
     }
 }
@@ -191,8 +216,7 @@ module Bowling_Ball_Holder() {
         translate([0, 0, -OVER_CUT/2])  // Translate down by half the over-cut
         cylinder(
             h = HOLDER_HEIGHT + OVER_CUT,  // Make taller by the over-cut
-            r = HOLE_RADIUS,
-            $fn = FACETS
+            r = HOLE_RADIUS
         );
         
         if(TEXT_STRING)
